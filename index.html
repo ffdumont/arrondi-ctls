@@ -585,17 +585,12 @@ window.addEventListener('resize', dessine);
 /* --------------------------------------------------------------- l'ouverture */
 el('v_tot').textContent = V.duree.toFixed(1);
 el('convention').innerHTML =
-  `<strong>La norme dit 50 ft, la pratique de LFXU dit 30.</strong> Un manuel de vol compte ` +
-  `sa distance d'atterrissage depuis 50 ft au-dessus du seuil. Sur la ${P.nom}, le seuil est ` +
-  `décalé de ${P.decale.toFixed(0)} m — il reste ${P.decale.toFixed(0)} m de piste avant lui, ` +
-  `dessinés ici en plus clair — et les pilotes du club le franchissent à ` +
-  `${P.tch_pratique_ft.toFixed(0)} ft. C'est cette pratique que la loi de pilotage vole, et ` +
-  `c'est elle qui place le point d'aboutissement : sur une pente de ${V.pente}°, ` +
-  `${P.tch_pratique_ft.toFixed(0)} ft le mettent à +${M.aboutissement.toFixed(0)} m du seuil, ` +
-  `là où 50 ft le mettraient à +${(15.24 / Math.tan(V.pente * Math.PI / 180)).toFixed(0)} m. ` +
-  `Le repère 50 ft reste tracé parce que le manuel commence à compter de là. ` +
-  `Toutes les hauteurs du dessin sont comptées au-dessus du <strong>plan de piste</strong> ; ` +
-  `le sol, lui, porte son relief — à LFXU il s'enfonce de 2 m sous ce plan à l'aplomb du seuil.`;
+  `<strong>La norme dit 50 ft, LFXU dit 30.</strong> Le seuil de la ${P.nom} est décalé de ` +
+  `${P.decale.toFixed(0)} m et les pilotes du club le franchissent à ` +
+  `${P.tch_pratique_ft.toFixed(0)} ft : sur une pente de ${V.pente}°, cela place le point ` +
+  `d'aboutissement à +${M.aboutissement.toFixed(0)} m, contre ` +
+  `+${(15.24 / Math.tan(V.pente * Math.PI / 180)).toFixed(0)} m à 50 ft. Les hauteurs sont ` +
+  `comptées au-dessus du plan de piste.`;
 const sgn = v => (v > 0 ? '+' : '') + v.toFixed(0);
 el('b_x50').textContent = sgn(B.x50);
 el('b_td').textContent = sgn(B.toucher);
