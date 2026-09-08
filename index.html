@@ -61,28 +61,31 @@ h1 { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-weight: 700;
 .ruban { font-family: "IBM Plex Mono", monospace; font-size: .72rem;
          letter-spacing: .1em; text-transform: uppercase; color: var(--encre-2); }
 
-/* --- scene et chiffres, deux colonnes ------------------------------------- */
-.rangee { display: grid; grid-template-columns: minmax(0, 1fr) 272px; gap: 12px;
-          margin-top: 16px; align-items: stretch; }
-@media (max-width: 900px) { .rangee { grid-template-columns: minmax(0, 1fr); } }
-/* La scene est ETIREE par la colonne de chiffres (grille en `stretch`) : le canevas doit
-   donc remplir sa boite, sinon le decor s'arrete avant le bas et laisse une bande vide. */
-.scene { position: relative; border: 1px solid var(--regle); border-radius: 3px;
-         overflow: hidden; background: var(--ciel-b); box-shadow: 0 1px 0 var(--ombre);
-         min-height: clamp(300px, 46vh, 440px); }
-#vue { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.chiffres { border: 1px solid var(--regle); border-radius: 3px; background: var(--panneau);
-            padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 14px; }
-.chiffres h2 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 600;
-               font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
-               color: var(--encre-2); margin: 0 0 6px; }
-.paire { display: grid; grid-template-columns: auto auto; gap: 2px 12px; margin: 0;
+/* --- scene ---------------------------------------------------------------- */
+.scene { position: relative; margin-top: 16px; border: 1px solid var(--regle);
+         border-radius: 3px; overflow: hidden; background: var(--ciel-b);
+         box-shadow: 0 1px 0 var(--ombre); }
+#vue { display: block; width: 100%; height: clamp(300px, 46vh, 440px); }
+/* LES CHIFFRES QUI BOUGENT SE LISENT SUR LA VUE, pas a cote : l'oeil ne quitte pas
+   l'avion pour aller chercher sa hauteur. Le bilan, lui, ne bouge pas et attend en bas. */
+.hud { position: absolute; top: 10px; left: 12px;
+       background: color-mix(in srgb, var(--panneau) 86%, transparent);
+       border: 1px solid var(--regle); border-radius: 2px; padding: 9px 13px; }
+.paire { display: grid; grid-template-columns: auto auto; gap: 2px 14px; margin: 0;
          font-family: "IBM Plex Mono", monospace; font-size: .78rem;
          font-variant-numeric: tabular-nums; }
 .paire dt { color: var(--encre-2); }
 .paire dd { margin: 0; text-align: right; font-weight: 500; }
 .paire dd.fort { color: var(--trace); font-weight: 600; }
-.separateur { border-top: 1px solid var(--regle); }
+
+/* --- bilan, sous les bandes ----------------------------------------------- */
+.bilan { margin-top: 18px; display: grid; gap: 10px;
+         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.bilan section { border: 1px solid var(--regle); border-radius: 3px;
+                 background: var(--panneau); padding: 11px 14px 13px; }
+.bilan h2 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 600;
+            font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+            color: var(--encre-2); margin: 0 0 7px; }
 
 /* --- transport ----------------------------------------------------------- */
 .transport { display: flex; align-items: center; gap: 12px; margin-top: 12px;
@@ -122,43 +125,18 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <p class="ruban" id="ruban"></p>
   </header>
 
-  <div class="rangee">
-    <div class="scene"><canvas id="vue"></canvas></div>
-    <aside class="chiffres">
-      <div>
-        <h2>à cet instant</h2>
-        <dl class="paire">
-          <dt>hauteur</dt><dd><span id="v_h"></span> m</dd>
-          <dt>vitesse ind.</dt><dd><span id="v_ias"></span> kt</dd>
-          <dt>vitesse sol</dt><dd><span id="v_vsol"></span> kt</dd>
-          <dt>variomètre</dt><dd><span id="v_vz"></span> ft/min</dd>
-          <dt>assiette</dt><dd><span id="v_theta"></span>°</dd>
-          <dt>incidence</dt><dd><span id="v_alpha"></span>°</dd>
-          <dt>freinage</dt><dd><span id="v_frein"></span></dd>
-          <dt>au seuil</dt><dd><span id="v_x"></span> m</dd>
-        </dl>
-      </div>
-      <div class="separateur"></div>
-      <div>
-        <h2>l'atterrissage</h2>
-        <dl class="paire">
-          <dt>passage 50 ft</dt><dd><span id="b_x50"></span> m</dd>
-          <dt>toucher</dt><dd><span id="b_td"></span> m</dd>
-          <dt>roulage</dt><dd><span id="b_roul"></span> m</dd>
-          <dt>arrêt</dt><dd><span id="b_arret"></span> m</dd>
-          <dt>50 ft → arrêt</dt><dd><span id="b_d50"></span> m</dd>
-          <dt>frein appliqué</dt><dd><span id="b_frein"></span></dd>
-        </dl>
-      </div>
-      <div class="separateur"></div>
-      <div>
-        <h2>piste utilisée</h2>
-        <dl class="paire">
-          <dt>LDA <span id="b_piste"></span></dt><dd><span id="b_lda"></span> m</dd>
-          <dt>utilisée</dt><dd class="fort"><span id="b_pct"></span> %</dd>
-        </dl>
-      </div>
-    </aside>
+  <div class="scene">
+    <canvas id="vue"></canvas>
+    <dl class="paire hud">
+      <dt>hauteur</dt><dd><span id="v_h"></span> m</dd>
+      <dt>vitesse ind.</dt><dd><span id="v_ias"></span> kt</dd>
+      <dt>vitesse sol</dt><dd><span id="v_vsol"></span> kt</dd>
+      <dt>variomètre</dt><dd><span id="v_vz"></span> ft/min</dd>
+      <dt>assiette</dt><dd><span id="v_theta"></span>°</dd>
+      <dt>incidence</dt><dd><span id="v_alpha"></span>°</dd>
+      <dt>freinage</dt><dd><span id="v_frein"></span></dd>
+      <dt>au seuil</dt><dd><span id="v_x"></span> m</dd>
+    </dl>
   </div>
 
   <div class="transport">
@@ -176,6 +154,36 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
   </div>
 
   <section class="bandes" id="bandes"></section>
+
+  <div class="bilan">
+    <section>
+      <h2>l'atterrissage</h2>
+      <dl class="paire">
+        <dt>passage 50 ft</dt><dd><span id="b_x50"></span> m</dd>
+        <dt>toucher</dt><dd><span id="b_td"></span> m</dd>
+        <dt>roulage</dt><dd><span id="b_roul"></span> m</dd>
+        <dt>arrêt</dt><dd><span id="b_arret"></span> m</dd>
+        <dt>50 ft → arrêt</dt><dd><span id="b_d50"></span> m</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>freinage</h2>
+      <dl class="paire">
+        <dt>commande</dt><dd><span id="b_frein"></span></dd>
+        <dt>décélération moyenne</dt><dd><span id="b_frein_moy"></span> m/s²</dd>
+        <dt>soit</dt><dd><span id="b_frein_g"></span> g</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>piste utilisée</h2>
+      <dl class="paire">
+        <dt>LDA <span id="b_piste"></span></dt><dd><span id="b_lda"></span> m</dd>
+        <dt>bande</dt><dd><span id="b_bande"></span> m</dd>
+        <dt>seuil décalé</dt><dd><span id="b_decale"></span> m</dd>
+        <dt>utilisée</dt><dd class="fort"><span id="b_pct"></span> %</dd>
+      </dl>
+    </section>
+  </div>
 
   <div class="legende">
     <span><i class="pastille" style="background:var(--trace)"></i>trajectoire volée</span>
@@ -536,8 +544,12 @@ el('b_roul').textContent = B.roulage.toFixed(0);
 el('b_arret').textContent = sgn(B.arret);
 el('b_d50').textContent = B.dist_50ft.toFixed(0);
 el('b_frein').textContent = V.frein_cmd.toFixed(2) + ' de course';
+el('b_frein_moy').textContent = V.frein_moyen.toFixed(2);
+el('b_frein_g').textContent = (V.frein_moyen / 9.81).toFixed(2);
 el('b_piste').textContent = D.piste_info.nom;
 el('b_lda').textContent = D.piste_info.lda.toFixed(0);
+el('b_bande').textContent = D.piste_info.bande.toFixed(0);
+el('b_decale').textContent = D.piste_info.decale.toFixed(0);
 el('b_pct').textContent = B.pct_lda.toFixed(0);
 el('sous').textContent =
   `${V.piste} · volets ${V.volets}° · ${V.vref} kt · plan ${V.pente}° · ${V.masse} kg`;
