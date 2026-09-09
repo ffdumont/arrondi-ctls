@@ -81,8 +81,6 @@ h1 { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-weight: 700;
 .paire dd { margin: 0; text-align: right; font-weight: 500; }
 .paire dd.fort { color: var(--trace); font-weight: 600; }
 
-.note { margin: 14px 0 0; color: var(--encre-2); font-size: .88rem; max-width: 78ch; }
-.note strong { color: var(--encre); font-weight: 600; }
 
 /* --- bilan, sous les bandes ----------------------------------------------- */
 .bilan { margin-top: 18px; display: grid; gap: 10px;
@@ -159,8 +157,6 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     </div>
     <div class="horloge"><span id="v_t"></span> / <span id="v_tot"></span> s</div>
   </div>
-
-  <p class="note" id="convention"></p>
 
   <section class="bandes" id="bandes"></section>
 
@@ -690,20 +686,6 @@ window.addEventListener('resize', dessine);
 
 /* --------------------------------------------------------------- l'ouverture */
 el('v_tot').textContent = V.duree.toFixed(1);
-el('convention').innerHTML =
-  `<strong>La norme dit 50 ft, LFXU dit 30.</strong> Le seuil de la ${P.nom} est décalé de ` +
-  `${P.decale.toFixed(0)} m et les pilotes du club le franchissent à ` +
-  `${P.tch_pratique_ft.toFixed(0)} ft : sur une pente de ${V.pente}°, cela place le point ` +
-  `d'aboutissement à +${M.aboutissement.toFixed(0)} m, contre ` +
-  `+${(15.24 / Math.tan(V.pente * Math.PI / 180)).toFixed(0)} m à 50 ft. Les hauteurs sont ` +
-  `comptées au-dessus du plan de piste.` +
-  `<br><strong>Le manuel de vol, lui, ne parle jamais du seuil.</strong> Sa distance ` +
-  `commence là où l'avion est à 15 m au-dessus du plan de piste : franchir le seuil à ` +
-  `${MAN.h_seuil_ft.toFixed(0)} ft plutôt qu'à 50 place ce point ${(-MAN.x50).toFixed(0)} m ` +
-  `<em>avant</em> le seuil, et cette avance est un crédit — la distance consommée après ` +
-  `le seuil vaut celle du manuel moins ce recul. À ${V.masse.toFixed(0)} kg et ` +
-  `${MAN.da_ft.toFixed(0)} ft d'altitude-densité, le manuel pose donc les roues à ` +
-  `+${MAN.toucher.toFixed(0)} m et arrête l'avion à +${MAN.arret.toFixed(0)} m.`;
 const sgn = v => (v > 0 ? '+' : '') + v.toFixed(0);
 el('b_x50').textContent = sgn(B.x50);
 el('b_td').textContent = sgn(B.toucher);
