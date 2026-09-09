@@ -7,17 +7,25 @@ de la piste à l'échelle, et les bandes de mesure synchronisées sous elle.
 
 ## Ce que la page montre
 
-**Six essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
+**Huit essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
 du projet flare-sim à LFXU 28R. La page s'ouvre sur `20260908-163103` — volets 15, 60 kt,
 plan à 5 % — et l'adresse porte l'essai regardé (`?essai=<identifiant>`), donc un lien
 envoyé rouvre bien le même vol.
 
-Les six se lisent comme une campagne : trois volés gaz portés jusqu'à l'arrondi, trois avec
-les **gaz coupés au passage des 50 ft**, qui est la condition dans laquelle le manuel de vol
-établit ses distances d'atterrissage. Le panneau « ce qui a été volé » donne, pour l'essai
-affiché, la masse, la vitesse d'approche, la pente commandée, la hauteur au seuil, les
-réglages d'arrondi et de freinage, et les deux valeurs qui décident si deux essais se
-comparent : la coupure des gaz, et la vitesse à laquelle le roulement est arrêté.
+Les huit se lisent comme une campagne, et trois leviers les séparent :
+
+- la **vitesse d'approche**, 60 ou 54 kt — celle du club, ou celle du manuel de vol ;
+- les **gaz coupés au passage des 50 ft**, qui est la condition dans laquelle le manuel
+  établit ses distances d'atterrissage ;
+- le **point d'aboutissement**, où le plan de descente coupe la piste : à +183 ou +136 m du
+  seuil selon la pente, ou **sur le seuil même** — la pratique de terrain court, qui rend la
+  LDA entière disponible.
+
+Le panneau « ce qui a été volé » donne, pour l'essai affiché, la masse, la vitesse
+d'approche, la pente commandée, la hauteur au seuil, l'aboutissement, les réglages d'arrondi
+et de freinage. Trois valeurs y sont en couleur parce qu'elles seules décident si deux essais
+se comparent : la coupure des gaz, l'aboutissement au seuil, et la vitesse à laquelle le
+roulement est arrêté.
 
 La silhouette porte l'assiette
 mesurée à chaque instant et pivote autour du point de contact de ses roues principales.

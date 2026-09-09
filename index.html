@@ -68,7 +68,7 @@ h1 { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-weight: 700;
                letter-spacing: .08em; }
 .choix select { font: inherit; font-size: .9rem; color: var(--encre);
                 background: var(--panneau); border: 1px solid var(--regle);
-                border-radius: 3px; padding: 5px 8px; max-width: 22rem; }
+                border-radius: 3px; padding: 5px 8px; max-width: 30rem; }
 .choix select:focus-visible { outline: 2px solid var(--trace); outline-offset: 1px; }
 /* CARACTERISTIQUES DU VOL : ce qui a ete VOLE, par opposition au bilan, qui est ce qui
    en est RESULTE. Deux essais ne se comparent que si l'on voit d'abord en quoi ils
@@ -756,6 +756,8 @@ function dessineCarac(C) {
   ligne(dl, 'pente command\u00e9e', `${C.pente_deg.toFixed(2)}\u00b0` +
         (C.pente_lue ? '' : ' (d\u00e9duite)'));
   ligne(dl, 'hauteur au seuil', `${C.tch_ft.toFixed(0)} ft`);
+  ligne(dl, 'aboutissement', C.aboutissement_m < 1
+        ? 'au seuil' : `+${C.aboutissement_m.toFixed(0)} m`, C.aboutissement_m < 1);
   ligne(dl, 'arrondi', `${C.arrondi_m.toFixed(1)} m \u00d7${C.arrondi_force.toFixed(2)}`);
   ligne(dl, 'gaz d\u2019arrondi', C.gaz_arrondi.toFixed(2));
   ligne(dl, 'gaz coup\u00e9s', C.coupe_ft === null ? 'non'
