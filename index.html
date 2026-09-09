@@ -113,6 +113,18 @@ h1 { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-weight: 700;
 
 
 /* --- bilan, sous les bandes ----------------------------------------------- */
+/* BANDEAUX D'ETIQUETTES. Les six lignes de rappel traversent les huit bandes ; les
+   nommer sur chacune ferait quarante-huit etiquettes pour six informations. Elles sont
+   donc portees UNE FOIS au-dessus de la pile et UNE FOIS en dessous, de sorte qu'aucune
+   bande ne soit a plus de trois graphes d'un nom.
+     Un canevas a part plutot qu'une marge dans la premiere et la derniere bande : voler
+   80 px a leur zone de trace y ecraserait la courbe, ce qui a ete essaye et vu. */
+/* 120 px : la plus longue etiquette ("manuel : toucher", seize caracteres a 10 px de
+   chasse fixe) mesure 96 px, plus le trait et sa marge. A 104 px elle debordait des deux
+   cotes -- mesure, pas estime. */
+.rappels { display: block; width: 100%; height: 120px; }
+#rappels_haut { margin-top: 16px; }
+#rappels_bas { margin-top: 2px; }
 .bilan { margin-top: 18px; display: grid; gap: 10px;
          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 .bilan section { border: 1px solid var(--regle); border-radius: 3px;
@@ -199,7 +211,9 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <div class="horloge"><span id="v_t"></span> / <span id="v_tot"></span> s</div>
   </div>
 
+  <canvas class="rappels" id="rappels_haut" aria-hidden="true"></canvas>
   <section class="bandes" id="bandes"></section>
+  <canvas class="rappels" id="rappels_bas" aria-hidden="true"></canvas>
 
   <div class="bilan">
     <section>
@@ -603,6 +617,75 @@ BANDES.forEach(b => {
   c.addEventListener('pointermove', e => { if (e.buttons) vise(e); });
 });
 
+/* LES LIGNES DE RAPPEL, DECLAREES UNE FOIS. Les bandes les tracent, les deux bandeaux
+   les nomment ; deux listes finiraient par ne plus porter les memes reperes. L'ordre est
+   celui du vol, ce qui rend la lecture des bandeaux monotone de gauche a droite. */
+const RAPPELS = () => [
+  [0, css('--encre'), .35, 'seuil'],
+  [M.arrondi, css('--arrondi'), .8, 'début d’arrondi'],
+  [M.aboutissement, css('--encre-2'), .55, 'aboutissement'],
+  [M.toucher_peint, css('--magenta'), .6, 'toucher médian'],
+  [MAN.toucher, css('--manuel'), .75, 'manuel : toucher'],
+  [MAN.arret, css('--manuel'), .75, 'manuel : arrêt'],
+];
+
+/* UN BANDEAU D'ETIQUETTES, au-dessus ou en dessous de la pile. Meme abscisse que les
+   bandes -- memes marges gauche et droite, meme indice d'image -- sans quoi une etiquette
+   designerait un instant voisin de celui qu'elle nomme.
+     LE TEXTE EST TOURNE parce que l'abscisse des bandes est le TEMPS et que l'avion
+   ralentit : les six reperes tombent dans le dernier tiers de la largeur, ou des
+   etiquettes horizontales se recouvriraient. */
+function dessineRappels(cv, enHaut) {
+  const [L, H] = dimensionne(cv);
+  const g = cv.getContext('2d');
+  const gauche = 46, droite = 12;
+  g.clearRect(0, 0, L, H);
+  if (!D) return;
+  g.font = '500 10px "IBM Plex Mono", monospace';
+  g.textBaseline = 'middle';
+  /* DEUX REPERES PEUVENT ETRE A QUELQUES METRES L'UN DE L'AUTRE -- sur l'essai de
+     reference le toucher du manuel tombe a +176 m et l'aboutissement a +183, soit sept
+     metres et quatre pixels. Ecrits a leur abscisse exacte, les deux textes verticaux se
+     superposent et aucun des deux ne se lit.
+       Ils sont donc TRIES puis ECARTES : un texte qui suit son voisin de moins de sa
+     propre largeur est decale d'un cran, et un petit trait de rappel le relie a son
+     abscisse vraie. Le TRAIT, lui, reste toujours a sa place -- c'est l'etiquette qui
+     bouge, jamais le repere. */
+  const poses = RAPPELS()
+    .filter(([xm]) => isFinite(xm))
+    .map(([xm, couleur, alpha, nom]) => {
+      const k = D.x.findIndex(v => v >= xm);
+      return k < 0 ? null : {couleur, alpha, nom,
+        X: gauche + (D.x[k] - D.x[0]) / (D.x[N - 1] - D.x[0]) * (L - gauche - droite)};
+    })
+    .filter(Boolean)
+    .sort((p, q) => p.X - q.X);
+  let precedent = -1e9;
+  for (const {X, couleur, alpha, nom} of poses) {
+    const XT = Math.max(X, precedent + 12);
+    precedent = XT;
+    g.strokeStyle = couleur; g.globalAlpha = Math.min(1, alpha + .25); g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(X, enHaut ? H - 7 : 0);
+    g.lineTo(X, enHaut ? H : 7);
+    if (XT > X + .5) {                       /* le trait de rappel vers l'etiquette */
+      g.moveTo(X, enHaut ? H - 7 : 7);
+      g.lineTo(XT, enHaut ? H - 7 : 7);
+    }
+    g.stroke();
+    g.globalAlpha = 1;
+    g.save();
+    g.fillStyle = couleur;
+    /* Tournee d'un quart de tour a gauche, le texte se lit de bas en haut. Depuis le
+       bandeau du HAUT il remonte a partir du trait, depuis celui du BAS il descend. */
+    g.translate(XT, enHaut ? H - 12 : 12);
+    g.rotate(-Math.PI / 2);
+    g.textAlign = enHaut ? 'left' : 'right';
+    g.fillText(nom, 0, 0);
+    g.restore();
+  }
+}
+
 function dessineBande(b) {
   const [L, H] = dimensionne(b.canvas);
   const g = b.canvas.getContext('2d');
@@ -696,6 +779,8 @@ function pose(k) {
 }
 
 function dessine() {
+  dessineRappels(el('rappels_haut'), true);
+  dessineRappels(el('rappels_bas'), false);
   dessineScene();
   BANDES.forEach(dessineBande);
 }
