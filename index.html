@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Arrondi CTLS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -195,7 +196,7 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <span><i class="pastille" style="background:var(--trace)"></i>trajectoire volée</span>
     <span><i class="pastille" style="background:var(--encre-2)"></i>plan de descente commandé</span>
     <span><i class="pastille" style="background:var(--marque);outline:1px solid var(--encre-2)"></i>point d'aboutissement</span>
-    <span><i class="pastille" style="background:var(--magenta)"></i>point de toucher moyen</span>
+    <span><i class="pastille" style="background:var(--magenta)"></i>point de toucher médian</span>
   </div>
 
 </main>
@@ -311,38 +312,58 @@ function dessineScene() {
     // LE HALO N'EST QUE POUR L'ABOUTISSEMENT : sa marque est blanche, et un trait blanc
     // sur un ciel clair ne se voit pas. L'encre et le magenta se passent de doublure.
     {xm: M.aboutissement, nom: 'aboutissement', c: css('--marque'), halo: true},
-    {xm: M.toucher_peint, nom: 'point de toucher moyen', c: css('--magenta')},
+    {xm: M.toucher_peint, nom: 'point de toucher médian', c: css('--magenta')},
   ].map(m => ({...m, X: px(m.xm), larg: largeurEtiq(m.nom)}));
 
-  /* SOUS-GRADUATIONS TOUS LES 10 m. C'est le pas auquel se lisent l'arrondi et le debut
-     du roulement : entre deux traits de 100 m, la distance parcourue par l'avion ne se
-     compte plus. Elles disparaissent quand l'echelle les serre a moins de 6 px, ou elles
-     feraient un peigne au lieu d'une regle. */
+  /* LA REGLE AU SOL, A DEUX PAS. Le trait de 100 m et son chiffre donnent la position sur
+     la piste ; le trait de 10 m et le sien, plus petits, donnent l'arrondi et les premiers
+     metres du roulement, ou la distance parcourue entre deux traits de 100 m ne se compte
+     plus. LA REGLE EST A L'ENCRE DU THEME, sombre sur fond clair et blanche sur fond
+     sombre : elle se pose sur la bande, qui est verte dans les deux cas. */
+  const chiffre = (d) => (d > 0 ? '+' + d : String(d));
+  const sousEtiq = (X) => MARQUES.some(m => Math.abs(m.X - X) < m.larg / 2 + 14);
+  const horsCadre = (X, marge) => X < -marge || X > L + marge;
+  const encre = css('--encre');
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+
+  /* LES SOUS-GRADUATIONS S'EFFACENT QUAND L'ECHELLE LES SERRE : sous 6 px entre deux
+     traits, la regle devient un peigne ; sous 50 px, deux chiffres se touchent. Les
+     chiffres partent donc avant les traits. */
   if (10 * ech >= 6) {
-    ctx.strokeStyle = css('--regle'); ctx.globalAlpha = .7; ctx.lineWidth = 1;
+    ctx.strokeStyle = encre; ctx.globalAlpha = .5; ctx.lineWidth = 1;
     ctx.beginPath();
     for (let d = -500; d <= 900; d += 10) {
       if (d % 100 === 0) continue;                 // le trait de 100 m est plus long
-      const X = px(d);
-      if (X < -20 || X > L + 20) continue;
+      const X = Math.round(px(d)) + .5;            // sur le demi-pixel : un trait net
+      if (horsCadre(X, 20)) continue;
       const Y = solPx(d);
-      ctx.moveTo(X, Y); ctx.lineTo(X, Y + 4);
+      ctx.moveTo(X, Y); ctx.lineTo(X, Y + 5);
     }
-    ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.stroke();
+    if (10 * ech >= 50) {
+      ctx.font = '400 9px "IBM Plex Mono", monospace';
+      ctx.fillStyle = encre; ctx.globalAlpha = .55;
+      for (let d = -500; d <= 900; d += 10) {
+        if (d % 100 === 0) continue;
+        const X = px(d);
+        if (horsCadre(X, 24) || sousEtiq(X)) continue;
+        ctx.fillText(chiffre(d), X, solPx(d) + 7);
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 
   /* graduations tous les 100 m */
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = '500 11px "IBM Plex Mono", monospace';
   for (let d = -500; d <= 900; d += 100) {
     const X = px(d);
-    if (X < -40 || X > L + 40) continue;
+    if (horsCadre(X, 40)) continue;
     const Y = solPx(d);
-    ctx.strokeStyle = css('--regle'); ctx.globalAlpha = .8; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X, Y + 7); ctx.stroke();
-    ctx.globalAlpha = 1; ctx.fillStyle = css('--encre-2');
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    const sousEtiq = MARQUES.some(m => Math.abs(m.X - X) < m.larg / 2 + 14);
-    if (d % 200 === 0 && !sousEtiq) ctx.fillText(d > 0 ? '+' + d : String(d), X, Y + 9);
+    ctx.strokeStyle = encre; ctx.globalAlpha = .85; ctx.lineWidth = 1.5;
+    const Xn = Math.round(X) + .5;
+    ctx.beginPath(); ctx.moveTo(Xn, Y); ctx.lineTo(Xn, Y + 10); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.fillStyle = encre;
+    if (!sousEtiq(X)) ctx.fillText(chiffre(d), X, Y + 12);
   }
 
   /* SEUIL, ABOUTISSEMENT, MARQUE DE TOUCHER, DESSINES TROIS FOIS. La barre peinte au sol
@@ -368,7 +389,7 @@ function dessineScene() {
     ctx.fillStyle = m.c; ctx.fillRect(m.X - 7, Y - 1, 14, 6);
     ctx.strokeStyle = css('--encre-2'); ctx.lineWidth = 1;
     ctx.strokeRect(m.X - 7.5, Y - 1.5, 15, 7);
-    etiquette(m, Y + 14, L);
+    etiquette(m, Y + 16, L);
   }
 
   /* le plan de descente commande : droite qui passe par le seuil a la TCH */
