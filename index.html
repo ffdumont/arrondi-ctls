@@ -18,6 +18,7 @@
   --magenta:  #D6236F;
   --marque:   #FFFFFF;
   --manuel:   #0F766E;
+  --arrondi:  #4A3AA7;
   --ombre:    rgba(22, 33, 44, .10);
 }
 @media (prefers-color-scheme: dark) {
@@ -35,6 +36,7 @@
     --magenta:  #F0509A;
     --marque:   #F2F6FA;
     --manuel:   #2DD4BF;
+    --arrondi:  #9085E9;
     --ombre:    rgba(0, 0, 0, .38);
   }
 }
@@ -42,7 +44,8 @@
   --papier: #0D161E; --encre: #E4EDF4; --encre-2: #8FA3B4; --regle: #223140;
   --panneau: #121D27; --herbe: #3B4832; --herbe-2: #47543B; --ciel-h: #16222E;
   --ciel-b: #1B2A38; --trace: #F97316; --magenta: #F0509A; --marque: #F2F6FA;
-  --manuel: #2DD4BF; --ombre: rgba(0, 0, 0, .38);
+  --manuel: #2DD4BF; --arrondi: #9085E9;
+  --ombre: rgba(0, 0, 0, .38);
 }
 
 * { box-sizing: border-box; }
@@ -177,6 +180,7 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
       <dt>incidence</dt><dd><span id="v_alpha"></span>°</dd>
       <dt>accél. horiz.</dt><dd><span id="v_ax"></span> m/s²</dd>
       <dt>accél. vert.</dt><dd><span id="v_az"></span> m/s²</dd>
+      <dt>gaz</dt><dd><span id="v_thr"></span></dd>
       <dt>au seuil</dt><dd><span id="v_x"></span> m</dd>
     </dl>
   </div>
@@ -202,6 +206,7 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
       <h2>l'atterrissage</h2>
       <dl class="paire">
         <dt>passage 50 ft</dt><dd><span id="b_x50"></span> m</dd>
+        <dt>début d’arrondi</dt><dd><span id="b_arr"></span> m</dd>
         <dt>toucher</dt><dd><span id="b_td"></span> m</dd>
         <dt>roulage</dt><dd><span id="b_roul"></span> m</dd>
         <dt>arrêt</dt><dd><span id="b_arret"></span> m</dd>
@@ -241,6 +246,7 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <span><i class="pastille" style="background:var(--encre-2)"></i>plan de descente commandé</span>
     <span><i class="pastille" style="background:var(--marque);outline:1px solid var(--encre-2)"></i>point d'aboutissement</span>
     <span><i class="pastille" style="background:var(--magenta)"></i>point de toucher médian</span>
+    <span><i class="pastille" style="background:var(--arrondi)"></i>début d’arrondi</span>
     <span><i class="pastille" style="background:var(--manuel)"></i>manuel de vol : toucher, puis arrêt</span>
   </div>
 
@@ -365,6 +371,10 @@ function dessineScene() {
     // sur un ciel clair ne se voit pas. L'encre et le magenta se passent de doublure.
     {xm: M.aboutissement, nom: 'aboutissement', c: css('--marque'), halo: true},
     {xm: M.toucher_peint, nom: 'point de toucher médian', c: css('--magenta')},
+    /* LE DEBUT D'ARRONDI N'EST PAS UNE MARQUE PEINTE : rien ne le materialise sur la
+       piste, et il bouge d'un essai a l'autre. Il est pose ici parce que c'est l'endroit
+       ou le lecteur le cherche -- entre le seuil et le toucher, sur la meme regle. */
+    {xm: M.arrondi, nom: 'début d’arrondi', c: css('--arrondi')},
   ].map(m => ({...m, X: px(m.xm), larg: largeurEtiq(m.nom)}));
 
   /* LA REGLE AU SOL, A DEUX PAS. Le trait de 100 m et son chiffre donnent la position sur
@@ -563,6 +573,11 @@ const BANDES = [
   {cle: 'theta', titre: 'assiette et incidence (deg)',        fmt: v => v.toFixed(1),
    second: 'alpha', zero: true},
   {cle: 'elev',  titre: 'commande de profondeur',             fmt: v => v.toFixed(2),
+   zero: true},
+  /* LA MANETTE. Elle manquait, et c'est ce que la campagne du 09/09 fait varier : entre
+     un essai gaz portes et un essai coupe aux 50 ft, tout le reste se ressemble et c'est
+     cette bande-la qui les separe. Bornee a zero -- une manette negative n'existe pas. */
+  {cle: 'thr',   titre: 'commande de gaz',                    fmt: v => v.toFixed(2),
    zero: true}
 ];
 
@@ -618,6 +633,7 @@ function dessineBande(b) {
      couvrirait tout l'ecran sans rien designer. Les bandes, elles, montrent la course
      entiere, et les deux traits s'y lisent d'un coup : le second tombe la ou l'essai
      pose ses roues, c'est-a-dire la ou le manuel dit l'avion deja arrete. */
+  repere(M.arrondi, css('--arrondi'), .8);
   repere(MAN.toucher, css('--manuel'), .75);
   repere(MAN.arret, css('--manuel'), .75);
 
@@ -673,6 +689,7 @@ function pose(k) {
   el('v_vz').textContent = (D.vz[idx] > 0 ? '+' : '') + D.vz[idx].toFixed(0);
   el('v_theta').textContent = (D.theta[idx] > 0 ? '+' : '') + D.theta[idx].toFixed(1);
   el('v_alpha').textContent = D.alpha[idx].toFixed(1);
+  el('v_thr').textContent = D.thr[idx].toFixed(2);
   el('v_x').textContent = (D.x[idx] > 0 ? '+' : '') + D.x[idx].toFixed(0);
   el('v_t').textContent = D.t[idx].toFixed(1);
   dessine();
@@ -775,6 +792,7 @@ function dessineCarac(C) {
 function demarrer() {
 el('v_tot').textContent = V.duree.toFixed(1);
 el('b_x50').textContent = sgn(B.x50);
+el('b_arr').textContent = sgn(M.arrondi);
 el('b_td').textContent = sgn(B.toucher);
 el('b_roul').textContent = B.roulage.toFixed(0);
 el('b_arret').textContent = sgn(B.arret);
