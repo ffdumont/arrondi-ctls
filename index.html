@@ -195,7 +195,7 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <span><i class="pastille" style="background:var(--trace)"></i>trajectoire volée</span>
     <span><i class="pastille" style="background:var(--encre-2)"></i>plan de descente commandé</span>
     <span><i class="pastille" style="background:var(--marque);outline:1px solid var(--encre-2)"></i>point d'aboutissement</span>
-    <span><i class="pastille" style="background:var(--magenta)"></i>marque de toucher peinte</span>
+    <span><i class="pastille" style="background:var(--magenta)"></i>point de toucher moyen</span>
   </div>
 
 </main>
@@ -311,8 +311,25 @@ function dessineScene() {
     // LE HALO N'EST QUE POUR L'ABOUTISSEMENT : sa marque est blanche, et un trait blanc
     // sur un ciel clair ne se voit pas. L'encre et le magenta se passent de doublure.
     {xm: M.aboutissement, nom: 'aboutissement', c: css('--marque'), halo: true},
-    {xm: M.toucher_peint, nom: 'toucher peint', c: css('--magenta')},
+    {xm: M.toucher_peint, nom: 'point de toucher moyen', c: css('--magenta')},
   ].map(m => ({...m, X: px(m.xm), larg: largeurEtiq(m.nom)}));
+
+  /* SOUS-GRADUATIONS TOUS LES 10 m. C'est le pas auquel se lisent l'arrondi et le debut
+     du roulement : entre deux traits de 100 m, la distance parcourue par l'avion ne se
+     compte plus. Elles disparaissent quand l'echelle les serre a moins de 6 px, ou elles
+     feraient un peigne au lieu d'une regle. */
+  if (10 * ech >= 6) {
+    ctx.strokeStyle = css('--regle'); ctx.globalAlpha = .7; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let d = -500; d <= 900; d += 10) {
+      if (d % 100 === 0) continue;                 // le trait de 100 m est plus long
+      const X = px(d);
+      if (X < -20 || X > L + 20) continue;
+      const Y = solPx(d);
+      ctx.moveTo(X, Y); ctx.lineTo(X, Y + 4);
+    }
+    ctx.stroke(); ctx.globalAlpha = 1;
+  }
 
   /* graduations tous les 100 m */
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
