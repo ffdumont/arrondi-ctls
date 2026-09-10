@@ -7,7 +7,7 @@ de la piste à l'échelle, et les bandes de mesure synchronisées sous elle.
 
 ## Ce que la page montre
 
-**Douze essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
+**Quatorze essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
 du projet flare-sim à LFXU 28R. La page s'ouvre sur `20260908-163103` — volets 15, 60 kt,
 plan à 5 % — et l'adresse porte l'essai regardé (`?essai=<identifiant>`), donc un lien
 envoyé rouvre bien le même vol.
@@ -21,11 +21,19 @@ Huit se lisent comme une campagne, et trois leviers les séparent :
   seuil selon la pente, ou **sur le seuil même** — la pratique de terrain court, qui rend la
   LDA entière disponible.
 
-**Les quatre derniers ont été filmés**, et la section « ce que ça donne en vidéo » porte leurs
-liens. Ils n'ajoutent pas un levier, ils ajoutent les images : deux reprennent la
-configuration de `20260908-195249` — 60 kt, 3,84°, gaz portés, aboutissement à +136 m — et les
-deux autres celle de `20260909-191805`, où l'aboutissement est **sur le seuil**. Chacune des
-deux paires reproduit son essai d'origine à trois mètres près sur le toucher.
+**Les six derniers ont été filmés**, et la section « ce que ça donne en vidéo » porte leurs
+liens. Deux reprennent la configuration de `20260908-195249` — 60 kt, 3,84°, gaz portés,
+aboutissement à +136 m — et deux celle de `20260909-191805`, où l'aboutissement est **sur le
+seuil** ; chacune de ces paires reproduit son essai d'origine à trois mètres près sur le
+toucher, et n'ajoute donc pas un levier mais les images.
+
+**Les deux derniers, eux, ajoutent quelque chose** : ils **touchent** au seuil au lieu de le
+**viser**. Ce n'est pas la même chose, et l'écart entre les deux est le flottement — 178 m à
+60 kt gaz portés. L'aboutissement est donc placé 178 m *avant* le seuil, ce qu'aucun autre
+essai du catalogue ne fait, et les roues se posent à deux mètres du seuil après l'avoir
+franchi à 8 cm. La distance a été calculée avant le vol à partir des essais archivés, puis
+corrigée une fois : visé à −167 m l'avion touchait 11 m trop loin, le flottement croissant
+quand on vise plus tôt.
 
 Une fenêtre de X-Plane ne rend qu'un point de vue à la fois et son enregistreur filme ce qui
 est rendu, si bien que la place pilote et la caméra par le travers gauche viennent de **deux
