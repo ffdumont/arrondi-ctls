@@ -89,6 +89,11 @@ h1 { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-weight: 700;
 .carac dd { margin: 0; font-family: "IBM Plex Mono", monospace; font-size: .85rem;
             text-align: right; }
 .carac dd.pose { color: var(--trace); font-weight: 600; }
+/* FILMS : la meme boite que les caracteristiques, parce qu'ils disent la meme chose --
+   ce qui a ete vole -- par un autre moyen. Cachee quand l'essai n'a pas ete filme. */
+.films ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.films a { color: var(--trace); }
+.films .autre { color: var(--encre-2); }
 .carac .prose { margin: 10px 0 0; color: var(--encre-2); font-size: .78rem;
                 font-family: "IBM Plex Mono", monospace; word-break: break-word; }
 .ruban { font-family: "IBM Plex Mono", monospace; font-size: .72rem;
@@ -179,6 +184,12 @@ code { font-family: "IBM Plex Mono", monospace; font-size: .86em; }
     <h2>Ce qui a été volé</h2>
     <dl id="carac"></dl>
     <p class="prose" id="carac_notes"></p>
+  </section>
+
+  <section class="carac films" id="films" hidden>
+    <h2>Ce que ça donne en vidéo</h2>
+    <ul id="films_liste"></ul>
+    <p class="prose" id="films_notes"></p>
   </section>
 
   <div class="scene">
@@ -874,6 +885,36 @@ function dessineCarac(C) {
   el('carac_notes').textContent = C.notes || '';
 }
 
+/* LES FILMS DE L'ESSAI, ET CEUX DES AUTRES PASSAGES DU MEME SCENARIO. La distinction est
+   le point de la section : les courbes affichees sont celles d'UN vol, et un seul des
+   films montre ce vol-la. Presenter les deux sans le dire ferait passer deux passages
+   pour deux cameras d'un meme atterrissage. */
+function dessineFilms(films) {
+  const sec = el('films'), ul = el('films_liste');
+  ul.textContent = '';
+  if (!films || !films.length) { sec.hidden = true; return; }
+  sec.hidden = false;
+  for (const f of films) {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = f.url; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = f.poste;
+    li.append(a);
+    const q = document.createElement('span');
+    q.className = f.cet_essai ? 'ici' : 'autre';
+    q.textContent = f.cet_essai ? ' — cet essai'
+                                : ` — autre passage (${f.uid})`;
+    li.append(q);
+    ul.append(li);
+  }
+  el('films_notes').textContent =
+    'Une fenêtre de X-Plane ne rend qu’un point de vue à la fois et son '
+    + 'enregistreur filme ce qui est rendu : les deux prises de vue viennent de deux '
+    + 'passages successifs du même scénario, archivés comme deux essais. '
+    + 'L’avion a touché au mètre près au même endroit sur les '
+    + 'deux, et le banc leur a donné la même note.';
+}
+
 function demarrer() {
 el('v_tot').textContent = V.duree.toFixed(1);
 el('b_x50').textContent = sgn(B.x50);
@@ -901,6 +942,7 @@ el('ruban').textContent = [`essai ${D.uid}`, V.verdict, V.note ? V.note + '/100'
 /* ETAT AU REPOS : la page s'ouvre sur l'arrondi, pas sur une image vide -- c'est le
    moment qu'elle existe pour montrer. La lecture, elle, part du debut de la finale. */
 dessineCarac(D.carac);
+dessineFilms(D.films);
 const iArrondi = D.x.findIndex(v => v >= M.aboutissement);
 pose(iArrondi > 0 ? iArrondi : 0);
 }

@@ -7,12 +7,12 @@ de la piste à l'échelle, et les bandes de mesure synchronisées sous elle.
 
 ## Ce que la page montre
 
-**Huit essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
+**Dix essais, au choix dans le sélecteur en haut à droite**, tous volés sur le banc X-Plane
 du projet flare-sim à LFXU 28R. La page s'ouvre sur `20260908-163103` — volets 15, 60 kt,
 plan à 5 % — et l'adresse porte l'essai regardé (`?essai=<identifiant>`), donc un lien
 envoyé rouvre bien le même vol.
 
-Les huit se lisent comme une campagne, et trois leviers les séparent :
+Huit se lisent comme une campagne, et trois leviers les séparent :
 
 - la **vitesse d'approche**, 60 ou 54 kt — celle du club, ou celle du manuel de vol ;
 - les **gaz coupés au passage des 50 ft**, qui est la condition dans laquelle le manuel
@@ -20,6 +20,14 @@ Les huit se lisent comme une campagne, et trois leviers les séparent :
 - le **point d'aboutissement**, où le plan de descente coupe la piste : à +183 ou +136 m du
   seuil selon la pente, ou **sur le seuil même** — la pratique de terrain court, qui rend la
   LDA entière disponible.
+
+**Les deux derniers ont été filmés**, et la section « ce que ça donne en vidéo » porte leurs
+liens. Ils volent la configuration du troisième — 60 kt, 3,84°, gaz portés — et n'ajoutent
+donc pas un levier : ils ajoutent les images. Une fenêtre de X-Plane ne rend qu'un point de
+vue à la fois et son enregistreur filme ce qui est rendu, si bien que la place pilote et la
+caméra par le travers gauche viennent de **deux passages successifs**, archivés comme deux
+essais. L'avion a touché au mètre près au même endroit sur les deux, et le banc leur a donné
+la même note ; ce ne sont pas pour autant deux caméras d'un même vol, et la page le dit.
 
 Le panneau « ce qui a été volé » donne, pour l'essai affiché, la masse, la vitesse
 d'approche, la pente commandée, la hauteur au seuil, l'aboutissement, les réglages d'arrondi
